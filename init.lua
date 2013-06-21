@@ -1,70 +1,55 @@
+require("node_modules.lua-loader.init")(function() end)
+local date = require("lua-date")
 
-local names = {
-  justnow = "nu net",
-  minute = {
-    singular = "min",
-    plural = "min"
-  },
-  hour = {
-    singular = "uur",
-    plural = "uur"
-  },
-  day = {
-    singular = "dag",
-    plural = "dagen"
-  },
-  week = {
-    singular = "week",
-    plural = "weken"
-  },
-  month = {
-    singular = "maand",
-    plural = "maanden"
-  },
-  year = {
-    singular = "jaar",
-    plural = "jaar"
-  }
-}
-local function timeago (time)
-  local span = date.diff(date(), time)
+local timeago = {}
+
+local language = require("english")
+
+function timeago.setlanguage (newlanguage)
+  if "table" == type(newlanguage) then
+    language = newlanguage
+  elseif "string" == type(newlanguage) then
+    language = require(newlanguage)
+  end
+  assert(language and language.justnow)
+  assert(language.minute and language.minute.singular and language.minute.plural)
+  assert(language.hour   and language.hour.singular   and language.hour.plural  )
+  assert(language.day    and language.day.singular    and language.day.plural   )
+  assert(language.week   and language.week.singular   and language.week.plural  )
+  assert(language.month  and language.month.singular  and language.month.plural )
+  assert(language.year   and language.year.singular   and language.year.plural  )
+end
+
+local function round (num)
+  return math.floor(num + .5)
+end
+
+function timeago.parse (time)
+  local span = date.diff(date(), time or date())
 
   local num = span:spanseconds()
-  if num < 45 then return names.justnow end
+  if num < 45 then return language.justnow end
 
   num = span:spanminutes()
-  if num < 1.5 then return "1 " .. names.minute.singular end
-  if num < 59.5 then return math.round(num) .. " " .. names.minute.plural end
+  if num < 1.5 then return "1 " .. language.minute.singular end
+  if num < 59.5 then return round(num) .. " " .. language.minute.plural end
 
   num = span:spanhours()
-  if num < 1.5 then return "1 " .. names.hour.singular end
-  if num < 23.5 then return math.round(num) .. " " .. names.hour.plural end
+  if num < 1.5 then return "1 " .. language.hour.singular end
+  if num < 23.5 then return round(num) .. " " .. language.hour.plural end
 
   num = span:spandays()
-  if num < 1.5 then return "1 " .. names.day.singular end
-  if num < 7.5 then return math.round(num) .. " " .. names.day.plural end
+  if num < 1.5 then return "1 " .. language.day.singular end
+  if num < 7.5 then return round(num) .. " " .. language.day.plural end
 
-  if num / 7 < 1.5 then return "1 " .. names.week.singular end
-  if num / 7 < 4.5 then return math.round(num / 7) .. " " .. names.week.plural end
+  if num / 7 < 1.5 then return "1 " .. language.week.singular end
+  if num / 7 < 4.5 then return round(num / 7) .. " " .. language.week.plural end
 
-  if num / 30 < 1.5 then return "1 " .. names.month.singular end
-  if num / 30 < 11.5 then return math.round(num / 30) .. " " .. names.month.plural end
+  if num / 30 < 1.5 then return "1 " .. language.month.singular end
+  if num / 30 < 11.5 then return round(num / 30) .. " " .. language.month.plural end
 
-  if num / 365.25 < 1.5 then return "1 " .. names.year.singular end
-  return math.floor(num / 365.25) .. " " .. names.year.plural
+  if num / 365.25 < 1.5 then return "1 " .. language.year.singular end
+  return round(num / 365.25) .. " " .. language.year.plural
 end
-print("2013-06-20T10:32+02:00", timeago("2013-06-20T10:32+02:00"))
-print("2013-06-19T10:32+02:00", timeago("2013-06-19T10:32+02:00"))
-print("2013-06-18T10:32+02:00", timeago("2013-06-18T10:32+02:00"))
-print("2013-06-17T10:32+02:00", timeago("2013-06-17T10:32+02:00"))
-print("2013-06-16T10:32+02:00", timeago("2013-06-16T10:32+02:00"))
-print("2013-06-15T10:32+02:00", timeago("2013-06-15T10:32+02:00"))
-print("2013-06-14T10:32+02:00", timeago("2013-06-14T10:32+02:00"))
-print("2013-06-13T10:32+02:00", timeago("2013-06-13T10:32+02:00"))
-print("2013-06-12T10:32+02:00", timeago("2013-06-12T10:32+02:00"))
-print("2013-06-07T10:32+02:00", timeago("2013-06-07T10:32+02:00"))
-print("2013-06-01T10:32+02:00", timeago("2013-06-01T10:32+02:00"))
-print("2013-05-15T10:32+02:00", timeago("2013-05-15T10:32+02:00"))
-print("2012-07-20T10:32+02:00", timeago("2012-07-20T10:32+02:00"))
-print("2011-07-20T10:32+02:00", timeago("2011-07-20T10:32+02:00"))
-print("1971-07-20T10:32+02:00", timeago("1971-07-20T10:32+02:00"))
+
+return timeago

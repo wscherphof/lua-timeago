@@ -3,6 +3,11 @@
   "version": "0.0.1",
   "description": "Turn a timestamp into a friendly string of how long ago it was",
   "main": "init.lua",
+  "dependencies": {
+    "lua-loader": "~0.0.1",
+    "lua-date": "~2.1.0"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
